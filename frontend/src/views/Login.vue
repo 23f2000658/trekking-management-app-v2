@@ -16,6 +16,9 @@
         
         <button type="submit" class="btn btn-primary w-100">Log in</button>
       </form>
+      <p class="text-center mt-3 text-muted small">
+        New User? <a href="/register" class="text-decoration-none">Register here</a>
+      </p>
     </div>
   </div>
 </template>
@@ -48,16 +51,25 @@ const handleLogin = async () => {
     alert("Invalid Credentials or Server Error!");
   }
 };
+
+const config = {
+  headers: {
+    'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+}
+axios.get('/api/auth/profile', config)
+
 </script>
 
 <style scoped>
 
 .login-wrapper {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: #2E8B57;
 }
 
 .card {
+  background: #FFFFFF;
   border: none;
   border-radius: 12px;
 }

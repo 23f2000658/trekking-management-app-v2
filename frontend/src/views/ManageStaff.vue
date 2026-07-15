@@ -1,9 +1,14 @@
 <template>
   <div class="container-fluid p-4">
     <h3 class="mb-4">Create New Trekking Staff</h3>
+    <button class="btn btn-info" @click="goTostaff">All Staff</button>
 
     <form @submit.prevent="createStaff" class="bg-white p-4 shadow-sm rounded">
       <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Staff id</label>
+          <input type="text" v-model="staff.staff_id" placeholder="staff_<staffname>" class="form-control" required>
+        </div>
         <div class="col-md-6">
           <label class="form-label">Full Name</label>
           <input type="text" v-model="staff.name" class="form-control" required>
@@ -15,10 +20,7 @@
       </div>
 
       <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Contact Number</label>
-          <input type="text" v-model="staff.contact" class="form-control" required>
-        </div>
+        
         <div class="col-md-6">
           <label class="form-label">Password</label>
           <input type="password" v-model="staff.password" class="form-control" required>
@@ -28,16 +30,6 @@
       <div class="mb-3">
         <label class="form-label">Confirm Password</label>
         <input type="password" v-model="staff.confirmPassword" class="form-control" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Experience</label>
-        <input type="text" v-model="staff.experience" class="form-control" placeholder="e.g., 5 years">
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Specialization</label>
-        <input type="text" v-model="staff.specialization" class="form-control" placeholder="e.g., High Altitude, First Aid">
       </div>
 
       <div class="mb-3">
@@ -63,16 +55,17 @@
 
 <script setup>
 import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios'; 
 
+const router = useRouter();
+
 const staff = reactive({
+  staff_id: '',
   name: '',
   email: '',
-  contact: '',
   password: '',
   confirmPassword: '',
-  experience: '',
-  specialization: '',
   status: 'Active'
 });
 
@@ -83,28 +76,23 @@ const createStaff = async () => {
   }
 
   try {
-    const response = await axios.post('http://127.0.0.1:5000/api/admin/create-staff', {
-      name: staff.name,
+      await axios.post('http://127.0.0.1:5000/api/admin/create-staff', {
+      user_id: staff.staff_id, 
+      username: staff.name,
       email: staff.email,
-      contact: staff.contact,
       password: staff.password,
-      experience: staff.experience,
-      specialization: staff.specialization,
       status: staff.status
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
-
-    alert(response.data.message);
-
-    Object.assign(staff, {
-      name: '', email: '', contact: '', password: '', 
-      confirmPassword: '', experience: '', specialization: '', status: 'Active'
-    });
-
-  } catch (error) {
-    console.error(error);
-    alert("Error: " + (error.response?.data?.message || "Something went wrong!"));
+  
+    alert("Registration Successful!");
   }
+    catch (error) {
+    console.error("Registration failed:", error.response ? error.response.data : error.message);
+    alert("Error: Could not register user.");
+  }
+};
+
+const goTostaff = () => {
+  router.push('/all-staff');
 };
 </script>

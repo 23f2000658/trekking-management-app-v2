@@ -5,7 +5,7 @@
       <div class="list-group list-group-flush">
         <a href="#" class="list-group-item list-group-item-action bg-primary text-white" @click="activeTab = 'dashboard'">My Dashboard</a>
         <a href="#" class="list-group-item list-group-item-action bg-primary text-white" @click="activeTab = 'my-treks'">My Assigned Treks</a>
-        <a href="#" class="list-group-item list-group-item-action bg-primary text-white" @click="activeTab = 'profile'">Profile</a>
+        <a href="#" class="list-group-item list-group-item-action bg-primary text-white" @click="activeTab = 'profile'">Registered Users</a>
       </div>
     </div>
 
@@ -19,8 +19,18 @@
         <div v-if="activeTab === 'dashboard'">
           <h4>Welcome, Staff Member</h4>
           <div class="row mt-3">
-            <div class="col-md-4"><div class="card p-3 shadow-sm bg-light"><h6>Assigned Treks</h6><h3>3</h3></div></div>
-            <div class="col-md-4"><div class="card p-3 shadow-sm bg-light"><h6>Total Participants</h6><h3>32</h3></div></div>
+            <div class="col-md-4">
+              <div class="card p-3 shadow-sm bg-light">
+                <h6>Assigned Treks</h6>
+                <h3>{{ myTreks.length }}</h3>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card p-3 shadow-sm bg-light">
+                <h6>Total Participants</h6>
+                <h3>{{ totalParticipants }}</h3>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -31,28 +41,80 @@
               <tr><th>Trek Name</th><th>Dates</th><th>Participants</th><th>Action</th></tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Everest Base Camp</td>
-                <td>31 May 2026</td>
-                <td>12</td>
-                <td><button class="btn btn-sm btn-info">Manage</button></td>
+
+              <tr v-for="trek in myTreks" :key="trek.id">
+
+              <td>{{ trek.name }}</td>
+
+              <td>{{ trek.start_date }} - {{ trek.end_date }}</td>
+
+              <td>{{ trek.participants }}</td>
+
+              <td>
+                <button
+                  class="btn btn-sm btn-primary"
+                  @click="manageTrek(trek.id)"
+                >
+                  Manage
+                </button>
+              </td>
+
               </tr>
+
+              <tr v-if="myTreks.length==0">
+              <td colspan="4" class="text-center">
+              No trek assigned yet.
+              </td>
+              </tr>
+
             </tbody>
           </table>
         </div>
+        <div v-if="activeTab === 'profile'">
+  <RegisteredUsers />
+</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from "vue";
+import api from "../axios";
+import RegisteredUsers from "./StaffRegisteredUser.vue";
 
-const activeTab = ref('dashboard');
+import { computed } from "vue";
+
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const manageTrek = (id) => {
+    router.push(`/staff/manage-trek/${id}`);
+};
+
+const totalParticipants = computed(() => {
+  return myTreks.value.reduce((sum, trek) => sum + trek.participants, 0);
+});
+
+const activeTab = ref("dashboard");
+const myTreks = ref([]);
+
+const fetchMyTreks = async () => {
+  try {
+    const res = await api.get("/api/staff/my-treks");
+    console.log("Treks:", res.data);
+    myTreks.value = res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+onMounted(fetchMyTreks);
 
 const logout = () => {
   localStorage.clear();
-  window.location.href = '/login';
+  window.location.href = "/login";
 };
 </script>
 

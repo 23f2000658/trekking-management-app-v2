@@ -5,6 +5,11 @@
       
       <form @submit.prevent="handleRegister">
         <div class="mb-3">
+          <label class="form-label">User id </label>
+          <input type="text" v-model="form.user_id" placeholder="user_<yourname>" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
           <label class="form-label">Full Name</label>
           <input type="text" v-model="form.name" class="form-control" required>
         </div>
@@ -26,7 +31,7 @@
         
         <button type="submit" class="btn btn-success w-100 mt-2">Register</button>
       </form>
-      
+      <p class="text-center mt-3 text-muted small"> Only User can Register </p>
       <p class="text-center mt-3 text-muted small">
         Already have an account? <a href="/login" class="text-decoration-none">Login here</a>
       </p>
@@ -41,6 +46,7 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const form = reactive({
+  user_id:'',
   name: '',
   email: '',
   password: '',
@@ -55,6 +61,7 @@ const handleRegister = async () => {
 
   try {
     await axios.post('http://127.0.0.1:5000/api/auth/register', {
+      user_id: form.user_id,
       username: form.name,
       email: form.email,
       password: form.password
@@ -72,12 +79,13 @@ const handleRegister = async () => {
 <style scoped>
 .register-wrapper {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: #1E3A8A;
 }
 
 .card {
   border: none;
   border-radius: 12px;
+  background: #F8FAFC;
 }
 </style>
 
